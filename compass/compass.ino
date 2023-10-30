@@ -1,3 +1,16 @@
+//以下インターフェース
+#include <ZumoMotors.h>
+#include <Wire.h>
+#include <LSM303.h>
+ZumoMotors motor;
+LSM303 compass;
+float mx, my, mz = 0;
+float sum_e = 0;
+float timeNow, timePrev = 0;
+void setup() {}
+void loop() {}
+
+//以下本体
 #define CRB_REG_M_2_5GAUSS 0x60
 #define CRA_REG_M_220HZ 0x1C
 
