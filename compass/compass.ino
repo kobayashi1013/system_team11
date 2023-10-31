@@ -3,16 +3,16 @@
 #include <Wire.h>
 #include <LSM303.h>
 ZumoMotors motor;
-LSM303 compass;
-float mx, my, mz = 0;
-float sum_e = 0;
-float timeNow, timePrev = 0;
 void setup() {}
 void loop() {}
 
 //以下本体
 #define CRB_REG_M_2_5GAUSS 0x60
 #define CRA_REG_M_220HZ 0x1C
+
+LSM303 compass;
+float sum_e = 0;
+float mx, my, mz = 0;
 
 void calibrationCompass()
 {
@@ -91,37 +91,53 @@ float heading(float _mx, float _my)
 //向く方向を調整（絶対量）
 bool worldTurn(float* _rotSpeed, float _angle)
 {
-  //定数
-  const float PItrg = 45.0; //PI制御とP制御の境界
-  const float Kp = 4.0; //比例ゲイン
-  const float Ti = 2; //積分時間
-  const float u_limit = 180; //最大速度制限
-  const float e_limit = 3; //制御時の閾値
+  const float interval = 50; //実行レート
 
-  float u;
-  float TIinv = Ti / 1000.0;
+  static unsigned long _timePrev = millis();
+  float u = 0;
+  bool ret = false;
 
-  float e = _angle - heading(mx, my); //方向の残差
-  if (e < -180) e += 360; //回転の向きを最適化
-  if (e > 180) e -= 360;
-
-  if (abs(e) <= e_limit) return true;
-
-  if (abs(e) > PItrg) //P制御
+  if (millis() - _timePrev >= interval) //調整開始
   {
-    u = Kp * e;
-  }
-  else //PI制御
-  {
-    sum_e += TIinv * e * (timeNow - timePrev);
-    u = Kp * (e + sum_e);
+    //定数
+    const float PItrg = 45.0; //PI制御とP制御の境界
+    const float Kp = 4.0; //比例ゲイン
+    const float Ti = 2; //積分時間
+    const float u_limit = 180; //最大速度制限
+    const float e_limit = 3; //制御時の閾値
+
+    float TIinv = Ti / 1000.0;
+
+    float e = _angle - heading(mx, my); //方向の残差
+    if (e < -180) e += 360; //回転の向きを最適化
+    if (e > 180) e -= 360;
+
+    if (abs(e) > PItrg) //P制御
+    {
+      u = Kp * e;
+    }
+    else //PI制御
+    {
+      sum_e += TIinv * e * interval;
+      u = Kp * (e + sum_e);
+    }
+
+    //飽和
+    if (u > u_limit) u = u_limit;
+    if (u < -1 * u_limit) u = -1 * u_limit;
+
+    if (abs(e) < e_limit) //調整完了
+    {
+      ret = true;
+      *_rotSpeed = 0;
+    }
+    else //調整継続
+    {
+      ret = false;
+    }
   }
 
-  if (u > u_limit) u = u_limit; //飽和
-  if (u < -1 * u_limit) u = -1 * u_limit;
-
-  *_rotSpeed = u;
-  return false;
+  return ret;
 }
 
 //向く方向を調整（変位量）
@@ -138,7 +154,7 @@ bool localTurn(float* _rotSpeed, float _angleDiff)
     _mode = 1;
     return false;
   }
-  else if (_mode == 1)
+  if (_mode == 1)
   {
     if (worldTurn(_rotSpeed, _angleOffset))
     {
