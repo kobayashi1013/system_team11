@@ -1,2 +1,4 @@
 # system_team11
-ここにメモを書き込める
+・compass デバッグ
+・colorSensor 保守
+・draw1 保守
