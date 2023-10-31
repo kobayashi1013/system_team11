@@ -1,6 +1,6 @@
 # system_team11
-・compass デバッグ
+・compass 保守
 
-・colorSensor 保守
+・colorSensor デバッグ
 
 ・draw1 保守
