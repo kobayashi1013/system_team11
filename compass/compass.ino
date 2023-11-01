@@ -1,10 +1,43 @@
 //以下インターフェース
 #include <ZumoMotors.h>
+#include <Pushbutton.h>
 #include <Wire.h>
 #include <LSM303.h>
 ZumoMotors motor;
-void setup() {}
-void loop() {}
+Pushbutton button(ZUMO_BUTTON);
+int mode;
+float rotSpeed = 0;
+void setup()
+{
+  Serial.begin(9600);
+  setupCompass();
+  button.waitForButton();
+  //キャリブレーション
+  calibrationCompass();
+  mode = 2;
+}
+void loop()
+{
+  getCompass();
+  
+  switch (mode)
+  {
+    case 0:
+      mode = 1;
+      break;
+    case 1:
+      if (worldTurn(&rotSpeed, 90, 100))
+      {
+        mode = 2;
+      }
+      break;
+    case 2:
+      compassMonitor(1000);
+      break;
+  }
+
+  motor.setSpeeds(rotSpeed, -1 * rotSpeed);
+}
 
 //以下本体
 #define CRB_REG_M_2_5GAUSS 0x60
@@ -16,12 +49,16 @@ float mx, my, mz = 0;
 
 void calibrationCompass()
 {
-  int mx_min = 32767, my_min = 32767;
-  int mx_max = -32767, my_max = -32767;
+  //定数
+  const int _calibTime = 10000;
+  
+  unsigned long _timePrev = millis();
+  int mx_min, my_min = 32767;
+  int mx_max, my_max = -32767;
 
   motor.setSpeeds(200, -200);
-
-  for (int i = 0; i < 70; i++)
+  
+  while (millis() - _timePrev < _calibTime)
   {
     compass.read();
 
@@ -29,15 +66,15 @@ void calibrationCompass()
     my_min = min(my_min, compass.m.y);
     mx_max = max(mx_max, compass.m.x);
     my_max = max(my_max, compass.m.y);
-
-    delay(50);
   }
 
   motor.setSpeeds(0, 0);
 
+  Serial.print("min : ");
   Serial.print(mx_min);
   Serial.print(' ');
   Serial.println(my_min);
+  Serial.print("max : ");
   Serial.print(mx_max);
   Serial.print(' ');
   Serial.println(my_max);
@@ -45,16 +82,17 @@ void calibrationCompass()
 
 void setupCompass()
 {
+  Wire.begin();
   compass.init();
   compass.enableDefault();
   compass.writeReg(LSM303::CRB_REG_M, CRB_REG_M_2_5GAUSS);
   compass.writeReg(LSM303::CRA_REG_M, CRA_REG_M_220HZ);
 
   //キャリブレーションの初期値を設定
-  compass.m_min.x = 1370;
-  compass.m_min.y = -308;
-  compass.m_max.x = 3500;
-  compass.m_max.y = 2286;
+  compass.m_min.x = 492;
+  compass.m_min.y = -4802;
+  compass.m_max.x = 1712;
+  compass.m_max.y = -1777;
   
   delay(1000); //必要
 }
@@ -69,6 +107,26 @@ void getCompass()
   compass.m_max.y = max(compass.m_max.y, compass.m.y);
   mx = map(compass.m.x, compass.m_min.x, compass.m_max.x, -128, 127); //マッピング
   my = map(compass.m.y, compass.m_min.y, compass.m_max.y, -128, 127);
+}
+
+//コンパスの確認
+void compassMonitor(const int interval)
+{
+  static unsigned long _timePrev = millis();
+
+  if (millis() - _timePrev >= interval)
+  {
+    _timePrev = millis();
+
+    //キャリブレーション前
+    compass.read();
+    Serial.print(compass.m.x);
+    Serial.print(' ');
+    Serial.println(compass.m.y);
+    
+    //角度
+    //Serial.println(heading(mx, my);
+  }
 }
 
 //方角を変換
@@ -89,22 +147,22 @@ float heading(float _mx, float _my)
 }
 
 //向く方向を調整（絶対量）
-bool worldTurn(float* _rotSpeed, float _angle)
+bool worldTurn(float* _rotSpeed, float _angle, const int interval)
 {
-  const float interval = 50; //実行レート
-
   static unsigned long _timePrev = millis();
   float u = 0;
   bool ret = false;
 
   if (millis() - _timePrev >= interval) //調整開始
   {
+    _timePrev = millis();
+    
     //定数
     const float PItrg = 45.0; //PI制御とP制御の境界
     const float Kp = 4.0; //比例ゲイン
     const float Ti = 2; //積分時間
     const float u_limit = 180; //最大速度制限
-    const float e_limit = 3; //制御時の閾値
+    const float e_limit = 10; //制御時の閾値
 
     float TIinv = Ti / 1000.0;
 
@@ -118,7 +176,7 @@ bool worldTurn(float* _rotSpeed, float _angle)
     }
     else //PI制御
     {
-      sum_e += TIinv * e * interval;
+      sum_e += TIinv * e * (millis() - _timePrev);
       u = Kp * (e + sum_e);
     }
 
@@ -130,10 +188,12 @@ bool worldTurn(float* _rotSpeed, float _angle)
     {
       ret = true;
       *_rotSpeed = 0;
+      sum_e = 0;
     }
     else //調整継続
     {
       ret = false;
+      *_rotSpeed = u;
     }
   }
 
@@ -141,7 +201,7 @@ bool worldTurn(float* _rotSpeed, float _angle)
 }
 
 //向く方向を調整（変位量）
-bool localTurn(float* _rotSpeed, float _angleDiff)
+bool localTurn(float* _rotSpeed, float _angleDiff, const int interval)
 {
   static int _mode = 0;
   static float _angleOffset = 0;
@@ -156,7 +216,7 @@ bool localTurn(float* _rotSpeed, float _angleDiff)
   }
   if (_mode == 1)
   {
-    if (worldTurn(_rotSpeed, _angleOffset))
+    if (worldTurn(_rotSpeed, _angleOffset, interval))
     {
       _mode = 0;
       return true;
