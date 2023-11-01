@@ -75,14 +75,18 @@ void colorSensorMonitor(int time)
   if (millis() - _timePrev >= time)
   {
     _timePrev = millis();
-    getColorSensor(&red, &green, &blue);
 
+    //色の観測
+    /*getColorSensor(&red, &green, &blue);
     Serial.print("color : ");
     Serial.print(red);
     Serial.print(' ');
     Serial.print(green);
     Serial.print(' ');
-    Serial.println(blue);
+    Serial.println(blue);*/
+
+    //色の判定
+    Serial.println(identifyColor());
   }
 }
 
