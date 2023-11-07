@@ -3,7 +3,7 @@
 
 #define dataNum 100
 #define hampel_window 5
-#define hampel_diff 0.5
+#define hampel_diff 3
 
 void setData(void);
 void drawData(int _value);
@@ -69,8 +69,8 @@ void shiftWindow(int _value)
 
 int filter(int _value)
 {
-	int _center = center(data, dataNum);
-	float _deviation = sqrt(dispersion(data, dataNum));
+	int _center = center(window, hampel_window);
+	float _deviation = sqrt(dispersion(window, hampel_window));
 
 	float _upper = _center + hampel_diff * _deviation;
 	float _lower = _center - hampel_diff * _deviation;
