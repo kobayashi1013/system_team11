@@ -14,6 +14,27 @@ LSM303 compass;
 float sum_e = 0;
 float mx, my, mz = 0;
 
+//地磁気センサのデバッグ 
+void compassMonitor()
+{
+  //実値
+  /*compass.read();
+  Serial.print(compass.m.x);
+  Serial.print(" ");
+  Serial.println(compass.m.y);*/
+
+  //キャリブレーション値
+  /*getCompass();
+  Serial.print(mx);
+  Serial.print(" ");
+  Serial.println(my);*/
+
+  //方向
+  /*getCompass();
+  Serial.println(heading(mx, my));*/
+}
+
+//地磁気センサのキャリブレーション
 void calibrationCompass()
 {
   int mx_min = 32767, my_min = 32767;
@@ -43,6 +64,7 @@ void calibrationCompass()
   Serial.println(my_max);
 }
 
+//地磁気センサのセットアップ
 void setupCompass()
 {
   compass.init();
@@ -51,10 +73,10 @@ void setupCompass()
   compass.writeReg(LSM303::CRA_REG_M, CRA_REG_M_220HZ);
 
   //キャリブレーションの初期値を設定
-  compass.m_min.x = 1370;
+  /*compass.m_min.x = 1370;
   compass.m_min.y = -308;
   compass.m_max.x = 3500;
-  compass.m_max.y = 2286;
+  compass.m_max.y = 2286;*/
   
   delay(1000); //必要
 }
@@ -63,10 +85,10 @@ void setupCompass()
 void getCompass()
 {
   compass.read(); //センサ値取得
-  compass.m_min.x = min(compass.m_min.x, compass.m.x); //キャリブレーション
+  /*compass.m_min.x = min(compass.m_min.x, compass.m.x); //キャリブレーション
   compass.m_min.y = min(compass.m_min.y, compass.m.y);
   compass.m_max.x = max(compass.m_max.x, compass.m.x);
-  compass.m_max.y = max(compass.m_max.y, compass.m.y);
+  compass.m_max.y = max(compass.m_max.y, compass.m.y);*/
   mx = map(compass.m.x, compass.m_min.x, compass.m_max.x, -128, 127); //マッピング
   my = map(compass.m.y, compass.m_min.y, compass.m_max.y, -128, 127);
 }
@@ -83,28 +105,26 @@ float correction(float _angle)
 //向いている方向を計算
 float heading(float _mx, float _my)
 {
-  float angle = atan2(_my, _mx) * 180 / M_PI;
-  angle = correction(angle);
-  return angle;
+  float _angle = atan2(_my, _mx) * 180 / M_PI;
+  _angle = correction(_angle);
+  return _angle;
 }
 
 //向く方向を調整（絶対量）
-bool worldTurn(float* _rotSpeed, float _angle)
+bool worldTurn(float* _rotSpeed, const float _angle, const int _interval)
 {
-  const float interval = 50; //実行レート
-
   static unsigned long _timePrev = millis();
   float u = 0;
   bool ret = false;
 
-  if (millis() - _timePrev >= interval) //調整開始
+  if (millis() - _timePrev >= _interval) //調整開始
   {
     //定数
     const float PItrg = 45.0; //PI制御とP制御の境界
     const float Kp = 4.0; //比例ゲイン
     const float Ti = 2; //積分時間
     const float u_limit = 180; //最大速度制限
-    const float e_limit = 3; //制御時の閾値
+    const float e_limit = 5; //制御時の閾値
 
     float TIinv = Ti / 1000.0;
 
@@ -118,7 +138,7 @@ bool worldTurn(float* _rotSpeed, float _angle)
     }
     else //PI制御
     {
-      sum_e += TIinv * e * interval;
+      sum_e += TIinv * e * _interval;
       u = Kp * (e + sum_e);
     }
 
@@ -141,7 +161,7 @@ bool worldTurn(float* _rotSpeed, float _angle)
 }
 
 //向く方向を調整（変位量）
-bool localTurn(float* _rotSpeed, float _angleDiff)
+bool localTurn(float* _rotSpeed, const float _angleDiff, const int _interval)
 {
   static int _mode = 0;
   static float _angleOffset = 0;
@@ -156,7 +176,7 @@ bool localTurn(float* _rotSpeed, float _angleDiff)
   }
   if (_mode == 1)
   {
-    if (worldTurn(_rotSpeed, _angleOffset))
+    if (worldTurn(_rotSpeed, _angleOffset, 0))
     {
       _mode = 0;
       return true;
