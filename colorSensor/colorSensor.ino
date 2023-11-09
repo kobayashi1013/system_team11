@@ -1,14 +1,20 @@
 //以下インターフェース
 #include <ZumoMotors.h>
+#include <Pushbutton.h>
 #include "Adafruit_TCS34725.h"
 ZumoMotors motor;
+Pushbutton button(ZUMO_BUTTON);
 float red, green, blue = 0;
 void setup() {
   Serial.begin(9600);
   setupColorSensor();
+  button.waitForButton();
   //calibrationColorSensor();
 }
-void loop() {}
+void loop()
+{
+  colorSensorMonitor(500);
+}
 
 //以下本体
 #define colorNum 4
@@ -17,10 +23,10 @@ Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_2_4MS
 float red_max, green_max, blue_max = 0;
 float red_min, green_min, blue_min = 0;
 unsigned int colorPos[colorNum][3] = {
-  {0, 0, 0}, //白
-  {0, 0, 0}, //黒
-  {0, 0, 0}, //赤
-  {0, 0, 0}, //青
+  {255, 255, 255}, //白
+  {12, 25, 28}, //黒
+  {121, 2, 4}, //赤
+  {1, 32, 96}, //青
 };
 
 //キャリブレーション用
@@ -29,9 +35,9 @@ void calibrationColorSensor()
   red_min = 32767, green_min = 32767, blue_min = 32767;
   red_max = -32767, green_max = -32767, blue_max = -32767;
 
-  motor.setSpeeds(150, 150); //前進
+  motor.setSpeeds(50, 50); //前進
 
-  for (int i = 0; i < 60; i++)
+  for (int i = 0; i < 100; i++)
   {
     colorSensor.getRGB(&red, &green, &blue);
 
@@ -69,14 +75,18 @@ void colorSensorMonitor(int time)
   if (millis() - _timePrev >= time)
   {
     _timePrev = millis();
-    getColorSensor(&red, &green, &blue);
 
+    //色の観測
+    /*getColorSensor(&red, &green, &blue);
     Serial.print("color : ");
     Serial.print(red);
     Serial.print(' ');
     Serial.print(green);
     Serial.print(' ');
-    Serial.println(blue);
+    Serial.println(blue);*/
+
+    //色の判定
+    Serial.println(identifyColor());
   }
 }
 
@@ -85,12 +95,12 @@ void setupColorSensor()
 {
   colorSensor.begin();
 
-  red_min = 0;
-  green_min = 0;
-  blue_min = 0;
-  red_max = 0;
-  green_max = 0;
-  blue_max = 0;
+  red_min = 47;
+  green_min = 66;
+  blue_min = 67;
+  red_max = 255;
+  green_max = 255;
+  blue_max = 255;
 }
 
 //センサ値取得
