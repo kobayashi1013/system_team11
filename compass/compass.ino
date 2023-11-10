@@ -6,7 +6,8 @@
 ZumoMotors motor;
 Pushbutton button(ZUMO_BUTTON);
 LSM303 compass;
-unsigned long timeNow, timePrev = 0;
+float speed = 0;
+int mode = 0;
 void setup()
 {
   Serial.begin(9600);
@@ -18,7 +19,23 @@ void setup()
 }
 void loop()
 {
-  compassMonitor(1000);
+  getCompass();
+
+  switch (mode)
+  {
+    case 0:
+      mode = 1;
+      break;
+    case 1:
+      if (worldTurn(&speed, 90)) {
+        mode = 99;
+      }
+      break;
+    case 99:
+      break;
+  }
+
+  motor.setSpeeds(speed, -1 * speed);
 }
 
 //以下本体
@@ -59,9 +76,15 @@ void compassMonitor(const int _interval)
 }
 
 //デバッグ
-void putStamp()
+void putStamp(int _time)
 {
-  Serial.println(stamp++);
+  static unsigned long _timePrev = millis();
+
+  if (millis() - _timePrev >= _time)
+  {
+    _timePrev = millis();
+    Serial.println(stamp++);
+  }
 }
 
 void calibrationCompass()
@@ -108,9 +131,9 @@ void setupCompass()
   compass.writeReg(LSM303::CRA_REG_M, CRA_REG_M_220HZ);
 
   //キャリブレーションの初期値を設定
-  compass.m_min.x = -715;
+  compass.m_min.x = 151;
   compass.m_min.y = -3769;
-  compass.m_max.x = 2084;
+  compass.m_max.x = 2946;
   compass.m_max.y = -361;
   
   delay(1000); //必要
@@ -169,30 +192,39 @@ bool worldTurn(float* _rotSpeed, float _angle)
   const float u_limit = 180; //最大速度制限
   const float e_limit = 5; //制御時の閾値
 
+  static unsigned long _timePrev = millis();
   float u;
+  bool ret = false;
   float TIinv = Ti / 1000.0;
 
   float e = _angle - heading(mx, my); //方向の残差
   if (e < -180) e += 360; //回転の向きを最適化
   if (e > 180) e -= 360;
 
-  if (abs(e) <= e_limit) return true;
-
   if (abs(e) > PItrg) //P制御
   {
+    sum_e = 0;
     u = Kp * e;
   }
   else //PI制御
   {
-    sum_e += TIinv * e * (timeNow - timePrev);
+    sum_e += TIinv * e * (millis() - _timePrev);
     u = Kp * (e + sum_e);
   }
 
   if (u > u_limit) u = u_limit; //飽和
   if (u < -1 * u_limit) u = -1 * u_limit;
 
+  //終了
+  if (abs(e) <= e_limit)
+  {
+    ret = true;
+    u = 0;
+  }
+
   *_rotSpeed = u;
-  return false;
+  _timePrev = millis();
+  return ret;
 }
 
 //向く方向を調整（変位量）
