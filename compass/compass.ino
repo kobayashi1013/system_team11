@@ -13,27 +13,33 @@ void setup()
   setupCompass();
 
   button.waitForButton();
-  //calibrationCompass();
+  calibrationCompass();
+  button.waitForButton();
 }
 void loop()
 {
-
+  compassMonitor(1000);
 }
 
 //以下本体
 #define CRB_REG_M_2_5GAUSS 0x60
 #define CRA_REG_M_220HZ 0x1C
-
-float mx, my, mz = 0;
+const float rc = 0.5; //RCフィルタ
+float filter[2][2];
+const float dirCorrection = 0;
+float mx, my;
 float sum_e = 0;
+int stamp = 0;
 
 //デバッグ
 void compassMonitor(const int _interval)
 {
-  unsigned long _timePrev = millis();
+  static unsigned long _timePrev = millis();
 
   if (millis() - _timePrev >= _interval)
   {
+    _timePrev = millis();
+
     //実値
     /*compass.read();
     Serial.print(compass.m.x);
@@ -47,13 +53,24 @@ void compassMonitor(const int _interval)
     Serial.println(my);*/
 
     //方向
-    /*getCompass();
-    Serial.println(heading(mx, my));*/
+    getCompass();
+    Serial.println(heading(mx, my));
   }
+}
+
+//デバッグ
+void putStamp()
+{
+  Serial.println(stamp++);
 }
 
 void calibrationCompass()
 {
+  //最初の計測
+  compass.read();
+  filter[0][0] = compass.m.x;
+  filter[0][1] = compass.m.y;
+
   int mx_min = 32767, my_min = 32767;
   int mx_max = -32767, my_max = -32767;
 
@@ -62,11 +79,12 @@ void calibrationCompass()
   for (int i = 0; i < 100; i++)
   {
     compass.read();
+    RC_Filter(compass.m.x, compass.m.y);
 
-    mx_min = min(mx_min, compass.m.x);
-    my_min = min(my_min, compass.m.y);
-    mx_max = max(mx_max, compass.m.x);
-    my_max = max(my_max, compass.m.y);
+    mx_min = min(mx_min, filter[0][0]);
+    my_min = min(my_min, filter[0][1]);
+    mx_max = max(mx_max, filter[0][0]);
+    my_max = max(my_max, filter[0][1]);
 
     delay(50);
   }
@@ -90,10 +108,10 @@ void setupCompass()
   compass.writeReg(LSM303::CRA_REG_M, CRA_REG_M_220HZ);
 
   //キャリブレーションの初期値を設定
-  /*compass.m_min.x = 1370;
-  compass.m_min.y = -308;
-  compass.m_max.x = 3500;
-  compass.m_max.y = 2286;*/
+  compass.m_min.x = -715;
+  compass.m_min.y = -3769;
+  compass.m_max.x = 2084;
+  compass.m_max.y = -361;
   
   delay(1000); //必要
 }
@@ -102,12 +120,26 @@ void setupCompass()
 void getCompass()
 {
   compass.read(); //センサ値取得
+  //RC_Filter(compass.m.x, compass.m.y); //フィルタ処理
+
   /*compass.m_min.x = min(compass.m_min.x, compass.m.x); //キャリブレーション
   compass.m_min.y = min(compass.m_min.y, compass.m.y);
   compass.m_max.x = max(compass.m_max.x, compass.m.x);
   compass.m_max.y = max(compass.m_max.y, compass.m.y);*/
   mx = map(compass.m.x, compass.m_min.x, compass.m_max.x, -128, 127); //マッピング
   my = map(compass.m.y, compass.m_min.y, compass.m_max.y, -128, 127);
+}
+
+//RCフィルタ
+void RC_Filter(float _mx, float _my)
+{
+  //移動
+  filter[1][0] = filter[0][0];
+  filter[1][1] = filter[0][1];
+
+  //フィルタ
+  filter[0][0] = rc * filter[1][0] + (1 - rc) * _mx;
+  filter[0][1] = rc * filter[1][1] + (1 - rc) * _my;
 }
 
 //方角を変換
@@ -123,7 +155,7 @@ float correction(float _angle)
 float heading(float _mx, float _my)
 {
   float angle = atan2(_my, _mx) * 180 / M_PI;
-  angle = correction(angle);
+  angle = correction(angle) + dirCorrection;
   return angle;
 }
 
