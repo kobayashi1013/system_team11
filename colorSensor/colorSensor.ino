@@ -110,14 +110,6 @@ void getColorSensor(float* _red, float* _green, float* _blue)
   float r, g, b = 0;
   colorSensor.getRGB(&r, &g, &b);
 
-  //キャリブレーション
-  red_min = min(red_min, r);
-  green_min = min(green_min, g);
-  blue_min = min(blue_min, b);
-  red_max = max(red_max, r);
-  green_max = max(green_max, g);
-  blue_max = max(blue_max, b);
-
   //線形変換
   *_red = map(r, red_min, red_max, 0, 255);
   *_green = map(g, green_min, green_max, 0, 255);
@@ -130,16 +122,12 @@ int identifyColor()
   int color = -1;
   float minDistance = 99999;
 
-  //色を取得
-  float _red, _green, _blue = 0;
-  getColorSensor(&_red, &_green, &_blue);
-
   //全色との距離を計算
   for (int i = 0; i < colorNum; i++)
   {
-    float distance = sqrt(pow(_red - colorPos[i][0], 2)
-      + pow(_green - colorPos[i][1], 2)
-      + pow(_blue - colorPos[i][2], 2));
+    float distance = sqrt(pow(red - colorPos[i][0], 2)
+      + pow(green - colorPos[i][1], 2)
+      + pow(blue - colorPos[i][2], 2));
     
     if (distance < minDistance)
     {

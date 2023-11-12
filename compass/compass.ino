@@ -41,10 +41,13 @@ void loop()
 //以下本体
 #define CRB_REG_M_2_5GAUSS 0x60
 #define CRA_REG_M_220HZ 0x1C
+
 const float rc = 0.5; //RCフィルタ
+const float dirCorrection = 0; //補正角度
+
 float filter[2][2];
-const float dirCorrection = 0;
-float mx, my;
+float mx, my = 0;
+float ax, ay = 0;
 float sum_e = 0;
 int stamp = 0;
 
@@ -63,15 +66,18 @@ void compassMonitor(const int _interval)
     Serial.print(" ");
     Serial.println(compass.m.y);*/
 
-    //修正値
+    //調整値
     /*getCompass();
     Serial.print(mx);
     Serial.print(" ");
     Serial.println(my);*/
+    /*Serial.print(compass.a.x / 256);
+    Serial.print(" ");
+    Serial.println(compass.a.y / 256);*/
 
     //方向
-    getCompass();
-    Serial.println(heading(mx, my));
+    /*getCompass();
+    Serial.println(heading(mx, my));*/
   }
 }
 
@@ -143,14 +149,14 @@ void setupCompass()
 void getCompass()
 {
   compass.read(); //センサ値取得
-  //RC_Filter(compass.m.x, compass.m.y); //フィルタ処理
 
-  /*compass.m_min.x = min(compass.m_min.x, compass.m.x); //キャリブレーション
-  compass.m_min.y = min(compass.m_min.y, compass.m.y);
-  compass.m_max.x = max(compass.m_max.x, compass.m.x);
-  compass.m_max.y = max(compass.m_max.y, compass.m.y);*/
-  mx = map(compass.m.x, compass.m_min.x, compass.m_max.x, -128, 127); //マッピング
+  //地磁気センサ
+  mx = map(compass.m.x, compass.m_min.x, compass.m_max.x, -128, 127);
   my = map(compass.m.y, compass.m_min.y, compass.m_max.y, -128, 127);
+
+  //加速度センサ
+  ax = compass.a.x / 256;
+  ay = compass.a.y / 256;
 }
 
 //RCフィルタ
