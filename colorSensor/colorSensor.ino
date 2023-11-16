@@ -86,7 +86,7 @@ void colorSensorMonitor(int time)
     Serial.println(blue);*/
 
     //色の判定
-    Serial.println(identifyColor());
+    //Serial.println(identifyColor(red, green, blue));
   }
 }
 
@@ -117,7 +117,7 @@ void getColorSensor(float* _red, float* _green, float* _blue)
 }
 
 //色の判別(N近傍法)
-int identifyColor()
+int identifyColor(int r, int g, int b)
 {
   int color = -1;
   float minDistance = 99999;
@@ -125,9 +125,9 @@ int identifyColor()
   //全色との距離を計算
   for (int i = 0; i < colorNum; i++)
   {
-    float distance = sqrt(pow(red - colorPos[i][0], 2)
-      + pow(green - colorPos[i][1], 2)
-      + pow(blue - colorPos[i][2], 2));
+    float distance = sqrt(pow(r - colorPos[i][0], 2)
+      + pow(g - colorPos[i][1], 2)
+      + pow(b - colorPos[i][2], 2));
     
     if (distance < minDistance)
     {
