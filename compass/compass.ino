@@ -1,12 +1,15 @@
 //以下インターフェース
 #include <Wire.h>
 #include <ZumoMotors.h>
+#include <ZumoBuzzer.h>
 #include <Pushbutton.h>
 #include <LSM303.h>
 ZumoMotors motor;
+ZumoBuzzer buzzer;
 Pushbutton button(ZUMO_BUTTON);
+
 LSM303 compass;
-float speed = 0;
+float speed = 150;
 int mode = 0;
 void setup()
 {
@@ -14,8 +17,8 @@ void setup()
   setupCompass();
 
   button.waitForButton();
-  calibrationCompass();
-  button.waitForButton();
+  //calibrationCompass();
+  //button.waitForButton();
 }
 void loop()
 {
@@ -27,15 +30,17 @@ void loop()
       mode = 1;
       break;
     case 1:
-      if (worldTurn(&speed, 90)) {
+      /*if (worldTurn(&speed, 90)) {
         mode = 99;
-      }
+      }*/
+      //compassMonitor(50);
+      //if (isStack()) buzzer.play(">>a32");
       break;
     case 99:
       break;
   }
 
-  motor.setSpeeds(speed, -1 * speed);
+  //motor.setSpeeds(speed, speed);
 }
 
 //以下本体
@@ -67,17 +72,20 @@ void compassMonitor(const int _interval)
     Serial.println(compass.m.y);*/
 
     //調整値
-    /*getCompass();
-    Serial.print(mx);
+    //getCompass();
+    /*Serial.print(mx);
     Serial.print(" ");
     Serial.println(my);*/
-    /*Serial.print(compass.a.x / 256);
+    /*Serial.print(ax);
     Serial.print(" ");
-    Serial.println(compass.a.y / 256);*/
+    Serial.println(ay);*/
 
     //方向
     /*getCompass();
     Serial.println(heading(mx, my));*/
+    //加速
+    /*getCompass();
+    Serial.println(sqrt(pow(ax, 2) + pow(ay, 2)));*/
   }
 }
 
@@ -233,32 +241,15 @@ bool worldTurn(float* _rotSpeed, float _angle)
   return ret;
 }
 
-//向く方向を調整（変位量）
-bool localTurn(float* _rotSpeed, float _angleDiff)
+//スタック検知
+bool isStack()
 {
-  static int _mode = 0;
-  static float _angleOffset = 0;
+  //定数
+  const float stack_limit = 10; //スタック検知値
 
-  if (_mode == 0)
-  {
-    _angleOffset = heading(mx, my) + _angleDiff; //目標の角度を計算
-    _angleOffset = correction(_angleOffset);
-    
-    _mode = 1;
-    return false;
-  }
-  else if (_mode == 1)
-  {
-    if (worldTurn(_rotSpeed, _angleOffset))
-    {
-      _mode = 0;
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
+  bool ret = false;
+  float acculate = sqrt(pow(ax, 2) + pow(ay, 2));
+  if (acculate >= stack_limit) ret = true;
 
-  return false;
+  return ret;
 }
