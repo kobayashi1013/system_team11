@@ -1,7 +1,7 @@
 void ColorWindow()
 {
   //背景
-  fill(32);
+  fill(0);
   rect(screen_width / 2, screen_height / 3, screen_width / 2, screen_height * 2 / 3);
   
   for (int i = 0; i < robot_max; i++)

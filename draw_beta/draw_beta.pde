@@ -10,6 +10,7 @@ int[] robot_distance = new int[robot_max]; //距離
 int[][] robot_color = new int[robot_max][3]; //カラー
 int[] robot_direction = new int[robot_max]; //方向
 int[] robot_speed = new int[robot_max]; //スピード
+int[] robot_point = new int[robot_max]; //得点
 int button_no = 0;
 
 void setup()
@@ -27,10 +28,6 @@ void setup()
   screen_pos1[1][1] = screen_height / 3;
   screen_pos1[2][0] = screen_width / 2; //USB2
   screen_pos1[2][1] = screen_height * 2 / 3;
-  
-  robot_color[0][0] = 250;
-  robot_color[0][1] = 100;
-  robot_color[0][2] = 0;
 }
 
 void draw()
@@ -42,7 +39,13 @@ void draw()
   Window3();
   Window4();
   
+  if (button_no == 0) DistanceWindow();
   if (button_no == 1) ColorWindow();
+  if (button_no == 2) DirectionWindow();
+  
+  if (++robot_direction[0] >= 360) robot_direction[0] = 0;
+  if (++robot_color[0][0] >= 255) robot_color[0][0] = 0;
+  if (++robot_distance[0] >= 50) robot_distance[0] = 0;
 }
 
 //スクリーンの初期化
