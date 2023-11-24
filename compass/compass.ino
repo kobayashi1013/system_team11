@@ -183,7 +183,7 @@ void RC_Filter(float _mx, float _my)
 float correction(float _angle)
 {
   while (_angle < 0) _angle += 360;
-  while (_angle > 359) _angle -= 360;
+  while (_angle > 360) _angle -= 360;
 
   return _angle;
 }
@@ -191,8 +191,8 @@ float correction(float _angle)
 //向いている方向を計算
 float heading(float _mx, float _my)
 {
-  float angle = atan2(_my, _mx) * 180 / M_PI;
-  angle = correction(angle) + dirCorrection;
+  float angle = atan2(_my, _mx) * 180 / M_PI + dirCorrection;
+  angle = correction(angle);
   return angle;
 }
 
