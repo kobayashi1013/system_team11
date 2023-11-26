@@ -6,6 +6,15 @@ final int robot_num = 3;
 //変数
 PFont[] font = new PFont[2];
 
+/////ネットワーク部との連携部分/////
+int[] robot_mode = new int[robot_num]; //ロボットの状態
+int[] robot_score = new int[robot_num]; //得点
+int[] robot_distance = new int[robot_num]; //距離
+int[][] robot_color = new int[robot_num][3]; //カラー
+int[] robot_direction = new int[robot_num]; //方向
+int[] robot_speed = new int[robot_num]; //スピード
+//////////////////////////////////
+
 void setup()
 {
   //初期設定
@@ -13,105 +22,35 @@ void setup()
   frameRate(60);
   
   //フォント設定
-  font[0] = loadFont("Calibri-Bold-48.vlw");
-  font[1] = loadFont("Calibri-Light-48.vlw");
+  font[0] = loadFont("YuGothic-Bold-48.vlw");
+  font[1] = loadFont("YuGothic-Medium-48.vlw");
 }
 
 void draw()
 {
   InitWindow();
   Window1();
+  Window2();
+  Window3();
 }
 
 void InitWindow()
 {
-  background(48);
-}
-
-void Window1() //ロボットの基本情報
-{
-  for (int i = 0; i < robot_num; i++)
-  {
-    //ウィンドウ
-    fill(80);
-    noStroke();
-    rect(20, (screen_height - 80) / robot_num * i + 80,
-      screen_width / 2 - 40, (screen_height - 80) / robot_num - 20, 8);
-      
-    //名前
-    fill(224);
-    textFont(font[1]);
-    textSize(28);
-    text("USB " + i, 30, (screen_height - 80) / robot_num * i + 110);
-    
-    //得点
-    fill(227, 37, 94);
-    rect(screen_width / 4, (screen_height - 80) / robot_num * i + 85,
-      6, 38);
-    
-    fill(224);
-    textFont(font[1]);
-    textSize(32);
-    text("point", screen_width / 4 + 15, (screen_height - 80) / robot_num * i + 110);
-    
-    fill(112);
-    rect(screen_width / 2 - 150, (screen_height - 80) / robot_num * i + 85,
-      120, 38, 8);
-    
-    //距離
-    fill(237, 223, 69);
-    rect(screen_width / 4, (screen_height - 80) / robot_num * i + 128,
-      6, 38);
-      
-    fill(224);
-    textFont(font[1]);
-    textSize(32);
-    text("distance", screen_width / 4 + 15, (screen_height - 80) / robot_num * i + 153);
-    
-    fill(112);
-    rect(screen_width / 2 - 150, (screen_height - 80) / robot_num * i + 128,
-      120, 38, 8);
-    
-    //カラー
-    fill(157, 229, 170);
-    rect(screen_width / 4, (screen_height - 80) / robot_num * i + 171,
-      6, 38);
-      
-    fill(224);
-    textFont(font[1]);
-    textSize(32);
-    text("color", screen_width / 4 + 15, (screen_height - 80) / robot_num * i + 196);
-    
-    fill(112);
-    rect(screen_width / 2 - 150, (screen_height - 80) / robot_num * i + 171,
-      120, 38, 8);
-    
-    //方向
-    fill(198, 121, 240);
-    rect(screen_width / 4, (screen_height - 80) / robot_num * i + 214,
-      6, 38);
-      
-    fill(224);
-    textFont(font[1]);
-    textSize(32);
-    text("direction", screen_width / 4 + 15, (screen_height - 80) / robot_num * i + 239);
-    
-    fill(112);
-    rect(screen_width / 2 - 150, (screen_height - 80) / robot_num * i + 214,
-      120, 38, 8);
-    
-    //スピード
-    fill(144, 219, 227);
-    rect(screen_width / 4, (screen_height - 80) / robot_num * i + 257,
-      6, 38);
-      
-    fill(224);
-    textFont(font[1]);
-    textSize(32);
-    text("speed", screen_width / 4 + 15, (screen_height - 80) / robot_num * i + 282);
-    
-    fill(112);
-    rect(screen_width / 2 - 150, (screen_height - 80) / robot_num * i + 257,
-      120, 38, 8);
-  }
+  background(32);
+  
+  //チーム名
+  fill(240);
+  textFont(font[0]);
+  textSize(64);
+  text("team 11", 30, 64);
+  
+  //総合得点
+  fill(227, 37, 94);
+  noStroke();
+  rect(300, 10, 270, 60, 8);
+  
+  fill(240);
+  textFont(font[1]);
+  textSize(40);
+  text("総合得点 " + (robot_score[0] + robot_score[1] + robot_score[2]), 310, 55);
 }
