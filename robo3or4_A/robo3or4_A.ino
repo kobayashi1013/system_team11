@@ -36,10 +36,13 @@ int motorR_G, motorL_G;                           // 左右のZumoのモータ�
 float mx_G = 0, my_G = 0, mz_G = 0;               //地磁気センサで読み取った値
 float ax_G = 0, ay_G = 0, az_G = 0;
 float heading_G = 0;
+int dist_G = 0;
+static int before_dist = 0;  //超音波センサ
 
 float sum_e = 0;     //turnTo関数で使用
 float rotSpeed = 0;  //worldTurn関数で使用
 int count_not0 = 0;  //judge_RorC関数で使用，前の距離の差が０じゃない回数
+int g_count = 0;     //task_Red,Blue で使用goal_count 探索位置（自陣か真ん中）のきりかえ
 
 //ループ内で使用
 int first = 0;  //最初のみ，初期位置の角度を取得する用
@@ -68,10 +71,13 @@ void setup() {
 }
 
 void loop() {
-  // getRGB(red_G, green_G, blue_G);  // カラーセンサでRGB値を取得(0-255)
   getColorSensor(&red_G, &green_G, &blue_G);  // カラーセンサでRGB値を取得(0-255)
   color = identify_color(red_G, green_G, blue_G);
-  getCompass();  //地磁気センサでmx_G, my_Gを取得
+  getCompass();         //地磁気センサでmx_G, my_Gを取得
+  dist_G = distance();  //超音波センサ
+  if (dist_G == 0) {    //エラーでたら前の距離を代入
+    dist_G = before_dist;
+  }
 
   timeNow_G = millis() - timeInit_G;     // 経過時間
   motors.setSpeeds(motorL_G, motorR_G);  // 左右モーターへの回転力入力
@@ -93,14 +99,18 @@ void loop() {
     first = 1;  //適当な数字を代入
   }
 
+  // Serial.println(kakudo);
+
+
   if (Color == 1) {  //自陣：赤
-  task_Red();
+    task_Red();
   } else if (Color == 2) {  //自陣：青
-    //task_Blue();
+    task_Blue();
   }
 
 
-  // Serial.println(mode_G);
+  Serial.println(mode_G);
+  //  Serial.println(dist_G);
   // task_Red();
   // search();
   // task_Blue();
@@ -113,8 +123,8 @@ void loop() {
   // motorL_G =  rotSpeed;
   // motorR_G =  - rotSpeed;
 
-
   timePrev_G = timeNow_G;
+  before_dist = dist_G;  //1つ前の距離を保存しておく
 }
 
 // 通信方式2
