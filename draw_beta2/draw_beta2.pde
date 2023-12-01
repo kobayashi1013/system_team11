@@ -110,7 +110,16 @@ void serialEvent(Serial p) {
     }
   }
  if (bod_f == true) // 1組のデータを読み込んだので
-    { p.write("A"); // 次のデータ送信要求を送信
+    {       if(p == port1){
+        port2.write('F');
+      }
+      else if(p ==port2){
+        port3.write('A');
+      }
+      else if(p == port3){
+        port1.write('K');
+      }
+      else port1.write('d');
     }
 }
 
