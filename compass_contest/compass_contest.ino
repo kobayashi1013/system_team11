@@ -12,20 +12,23 @@ Pushbutton button(ZUMO_BUTTON);
 LSM303 compass;
 
 float filter[2][2];
-float sum[4] = { 0 };
+float sensor[4][3];
 
 void setup()
 {
   Serial.begin(9600);
   setupCompass();
 
-  for (int i = 0; i < 3; i++)
+  while (true)
   {
-    button.waitForButton();
-    calibrationCompass();
-  }
+    for (int i = 0; i < 3; i++)
+    {
+      button.waitForButton();
+      calibrationCompass(i);
+    }
 
-  sendData();
+    sendData();
+  }
 }
 
 void loop() {}
@@ -41,7 +44,7 @@ void setupCompass()
   delay(1000);
 }
 
-void calibrationCompass()
+void calibrationCompass(int count)
 {
   //センサ取得
   compass.read();
@@ -55,7 +58,7 @@ void calibrationCompass()
   //計測開始
   motor.setSpeeds(150, -150);
 
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < 90; i++)
   {
     compass.read();
     RC_Filter(compass.m.x, compass.m.y);
@@ -72,10 +75,10 @@ void calibrationCompass()
   motor.setSpeeds(0, 0);
 
   //記録
-  sum[0] += mx_min;
-  sum[1] += my_min;
-  sum[2] += mx_max;
-  sum[3] += my_max;
+  sensor[0][count] = mx_min;
+  sensor[1][count] = my_min;
+  sensor[2][count] = mx_max;
+  sensor[3][count] = my_max;
 }
 
 //RCフィルタ
@@ -90,11 +93,53 @@ void RC_Filter(float mx, float my)
   filter[0][1] = rc * filter[1][1] + (1 - rc) * my;
 }
 
+//バブルソート（計算量が多いため、今後変えるかも）
+void sort(float _array[], const int _arrayNum)
+{
+  for (int i = 0; i < _arrayNum; i++)
+  {
+    for (int j = 0; j < _arrayNum; j++)
+    {
+      if (_array[i] > _array[j])
+      {
+        int _tmp = _array[i];
+        _array[i] = _array[j];
+        _array[j] = _tmp;
+      }
+    }
+  }
+}
+
+//中央値
+float center(const float _array[], const int _arrayNum)
+{
+  float _tmpArray[_arrayNum];
+
+  //配列のコピー
+  for (int i = 0; i < _arrayNum; i++) _tmpArray[i] = _array[i];
+
+  //ソート
+  sort(_tmpArray, _arrayNum);
+
+  //中央値の計算
+  float _center = 0;
+  if (_arrayNum % 2 == 1)
+  {
+    _center = _tmpArray[_arrayNum / 2];
+  }
+  else
+  {
+    _center = (_tmpArray[_arrayNum / 2] + _tmpArray[_arrayNum / 2 + 1]) / 2;
+  }
+
+  return _center;
+}
+
 //データ送信
 void sendData()
 {
-  Serial.println(int(sum[0] / 3));
-  Serial.println(int(sum[1] / 3));
-  Serial.println(int(sum[2] / 3));
-  Serial.println(int(sum[3] / 3));
+  Serial.println(int(center(sensor[0], 3)));
+  Serial.println(int(center(sensor[1], 3)));
+  Serial.println(int(center(sensor[2], 3)));
+  Serial.println(int(center(sensor[3], 3)));
 }
