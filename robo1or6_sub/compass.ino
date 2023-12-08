@@ -19,10 +19,10 @@ void setupCompass() {
 
   //キャリブレーションの初期値を設定
   //狩野
-  compass.m_min.x = -5768; 
-  compass.m_min.y = -2901;
-  compass.m_max.x = -2353;
-  compass.m_max.y = 940;
+  compass.m_min.x = -1097; 
+  compass.m_min.y = -4269;
+  compass.m_max.x = 2168;
+  compass.m_max.y = -583;
 
   //小林君
   // compass.m_min.x = 417;

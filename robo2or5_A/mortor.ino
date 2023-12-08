@@ -8,6 +8,7 @@ void task_Red() {  //自陣：赤の場合の挙動
   // static int before_dist = 0;  //1個前の距離
   int diff_dist = 0;
   static int c_count = 0;  //カップを見失った際の探索の最大回数
+  static int zurashi_time = 0;
 
   switch (mode_G) {
     case 0:
@@ -67,6 +68,7 @@ void task_Red() {  //自陣：赤の場合の挙動
       } else {           //秒数を過ぎたら（カップだった）
         count_not0 = 0;  //judge_RorC関数内のカウント初期化
         mode_G = 8;      //mode 10 (ゴールモードへ)
+        zurashi_time = map(dist_G, 0, 50, 0, 200);
         startTime = timeNow_G;
       }
       break;
@@ -106,6 +108,7 @@ void task_Red() {  //自陣：赤の場合の挙動
         count_not0 = 0;  //judge_RorC関数内のカウント初期化
         c_count = 0;
         mode_G = 8;  //mode 10 (ゴールモードへ)
+        zurashi_time = map(dist_G, 0, 50, 0, 200);
         startTime = timeNow_G;
       }
       break;
@@ -278,6 +281,7 @@ void task_Blue() {  //自陣：青の場合の挙動
   // static int before_dist = 0;  //1個前の距離
   int diff_dist = 0;
   static int c_count = 0;  //カップを見失った際の探索の最大回数
+  static int zurashi_time = 0;
 
   switch (mode_G) {
     case 0:
@@ -337,6 +341,7 @@ void task_Blue() {  //自陣：青の場合の挙動
       } else {           //秒数を過ぎたら（カップだった）
         count_not0 = 0;  //judge_RorC関数内のカウント初期化
         mode_G = 8;      //mode 10 (ゴールモードへ)
+        zurashi_time = map(dist_G, 0, 50, 0, 200);
         startTime = timeNow_G;
       }
       break;
@@ -376,6 +381,7 @@ void task_Blue() {  //自陣：青の場合の挙動
         count_not0 = 0;  //judge_RorC関数内のカウント初期化
         c_count = 0;
         mode_G = 8;  //mode 10 (ゴールモードへ)
+        zurashi_time = map(dist_G, 0, 50, 0, 200);
         startTime = timeNow_G;
       }
       break;
@@ -403,7 +409,7 @@ void task_Blue() {  //自陣：青の場合の挙動
       }
       break;
 
-    case 11:                            //ゴールモード，ゴール方向へ回転
+    case 11:                           //ゴールモード，ゴール方向へ回転
       if (worldTurn(&rotSpeed, 27)) {  //北（0）方向へ回転したら
         rotSpeed = 0;
         mode_G = 12;
