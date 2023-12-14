@@ -48,7 +48,7 @@ int g_count = 0;     //task_Red,Blue で使用goal_count 探索位置（自陣�
 int first = 0;  //最初のみ，初期位置の角度を取得する用
 int Color = 0;  //自陣の色　赤：１，青：２
 float kakudo = 0;
-float kakudo180 = 0;  //初期位置と，反対方向の角度
+// float kakudo180 = 0;  //初期位置と，反対方向の角度
 
 
 void setup() {
@@ -90,17 +90,14 @@ void loop() {
   if (first == 0) {
     kakudo = heading(mx_G, my_G);
     // Serial.println(kakudo);
-    if (300 <= kakudo || kakudo <= 50) {          //ロボが北(0)→（27ぐらい）を向いていたら（printfで角度確認する？？）
+    if (300 <= kakudo || kakudo <= 60) {          //ロボが北(0)→（27ぐらい）を向いていたら（printfで角度確認する？？）
       Color = 1;                                  //自陣は赤色
-    } else if (150 <= kakudo && kakudo <= 210) {  //ロボが南(180)を向いていたら
+    } else if (130 <= kakudo && kakudo <= 230) {  //ロボが南(180)を向いていたら
       Color = 2;                                  //自陣は青色
     }
 
     first = 1;  //適当な数字を代入
   }
-
-  // Serial.println(kakudo);
-
 
   if (Color == 1) {  //自陣：赤
     task_Red();
@@ -109,7 +106,7 @@ void loop() {
   }
 
 
-  Serial.println(mode_G);
+  // Serial.println(mode_G);
   //  Serial.println(dist_G);
   // task_Red();
   // search();

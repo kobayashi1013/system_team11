@@ -148,7 +148,7 @@ void task_Red() {  //自陣：赤の場合の挙動
       if (worldTurn(&rotSpeed, 190)) {  //南（180）方向へ回転したら
         rotSpeed = 0;
         mode_G = 12;
-      }
+      } 
       break;
 
     case 12:  //ゴールモード, ゴールラインまで直進

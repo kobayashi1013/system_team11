@@ -48,7 +48,7 @@ int g_count = 0;     //task_Red,Blue で使用goal_count 探索位置（自陣�
 int first = 0;  //最初のみ，初期位置の角度を取得する用
 int Color = 0;  //自陣の色　赤：１，青：２
 float kakudo = 0;
-float kakudo180 = 0;  //初期位置と，反対方向の角度
+// float kakudo180 = 0;  //初期位置と，反対方向の角度
 
 
 void setup() {
@@ -99,9 +99,6 @@ void loop() {
     first = 1;  //適当な数字を代入
   }
 
-  // Serial.println(kakudo);
-
-
   if (Color == 1) {  //自陣：赤
     task_Red();
   } else if (Color == 2) {  //自陣：青
@@ -109,7 +106,7 @@ void loop() {
   }
 
 
-  Serial.println(mode_G);
+  // Serial.println(mode_G);
   //  Serial.println(dist_G);
   // task_Red();
   // search();
