@@ -148,7 +148,7 @@ void task_Red() {  //自陣：赤の場合の挙動
       if (worldTurn(&rotSpeed, 190)) {  //南（180）方向へ回転したら
         rotSpeed = 0;
         mode_G = 12;
-      } 
+      }
       break;
 
     case 12:  //ゴールモード, ゴールラインまで直進
@@ -289,7 +289,7 @@ void task_Red() {  //自陣：赤の場合の挙動
     }
   }
 
-  if (mode_G == 2 || mode_G == 4 || mode_G == 10 || mode_G == 11 || mode_G == 12) {  //スタック検知
+  if (mode_G == 2 || mode_G == 4 || mode_G == 10 || mode_G == 11 || mode_G == 12 || mode_G == 13 || mode_G == 99 || mode_G == 100) {  //スタック検知
     if (isStack()) {
       mode_G = 102;
       speed = 0;
@@ -591,7 +591,7 @@ void task_Blue() {  //自陣：青の場合の挙動
     }
   }
 
-  if (mode_G == 2 || mode_G == 4 || mode_G == 10 || mode_G == 11 || mode_G == 12) {  //スタック検知
+  if (mode_G == 2 || mode_G == 4 || mode_G == 10 || mode_G == 11 || mode_G == 12 || mode_G == 13 || mode_G == 99 || mode_G == 100) {  //スタック検知
     if (isStack()) {
       mode_G = 102;
       speed = 0;
