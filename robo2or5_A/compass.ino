@@ -33,10 +33,10 @@ void setupCompass() {
 
 
   // //宇和佐君
-  compass.m_min.x = -1618;
-  compass.m_min.y = -4990;
-  compass.m_max.x = 1689;
-  compass.m_max.y = -1159;
+  compass.m_min.x = -4000;
+  compass.m_min.y = -4406;
+  compass.m_max.x = -1729;
+  compass.m_max.y = -1742;
 
 
   delay(1000);  // 良く分からないが必要
@@ -115,7 +115,7 @@ bool worldTurn(float* _rotSpeed, float angle) {
 //スタック検知
 bool isStack() {
   //定数
-  const float stack_limit = 10;  //スタック検知値
+  const float stack_limit = 50;  //スタック検知値
 
   bool ret = false;
   float acculate = sqrt(pow(ax_G, 2) + pow(ay_G, 2));

@@ -1,4 +1,4 @@
-//ロボ➁or➄
+//ロボ➀or➅
 #include <Wire.h>
 #include <ZumoMotors.h>
 #include <Pushbutton.h>
@@ -58,7 +58,7 @@ void setup() {
   pinMode(echo, INPUT);   //echoを入力ポートに設定
   setupCompass();         //地磁気センサ
   setupColorSensor();     //カラーセンサ
-  //ボタン→カラーセンサ→ボタン→ループに入る
+  //ボタン→ループに入る
   button.waitForButton();  // Zumo buttonが押されるまで待機
   //CalibrationColorSensor();  // カラーセンサーのキャリブレーション
   //button.waitForButton();
@@ -90,9 +90,9 @@ void loop() {
   if (first == 0) {
     kakudo = heading(mx_G, my_G);
     // Serial.println(kakudo);
-    if (300 <= kakudo || kakudo <= 50) {          //ロボが北(0)→（27ぐらい）を向いていたら（printfで角度確認する？？）
+    if (40 <= kakudo && kakudo <= 140) {          //ロボが東(90)を向いていたら（printfで角度確認する？？）
       Color = 1;                                  //自陣は赤色
-    } else if (150 <= kakudo && kakudo <= 210) {  //ロボが南(180)を向いていたら
+    } else if (200 <= kakudo && kakudo <= 340) {  //ロボが西(270)を向いていたら
       Color = 2;                                  //自陣は青色
     }
 

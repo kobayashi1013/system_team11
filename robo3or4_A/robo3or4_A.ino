@@ -90,9 +90,9 @@ void loop() {
   if (first == 0) {
     kakudo = heading(mx_G, my_G);
     // Serial.println(kakudo);
-    if (70 <= kakudo && kakudo <= 110) {          //ロボが東(90)を向いていたら（printfで角度確認する？？）
+    if (40 <= kakudo && kakudo <= 140) {          //ロボが東(90)を向いていたら（printfで角度確認する？？）
       Color = 2;                                  //自陣は青色
-    } else if (250 <= kakudo && kakudo <= 290) {  //ロボが西(270)を向いていたら
+    } else if (210 <= kakudo && kakudo <= 330) {  //ロボが西(270)を向いていたら
       Color = 1;                                  //自陣は赤色
     }
 

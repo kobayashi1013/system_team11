@@ -115,7 +115,7 @@ bool worldTurn(float* _rotSpeed, float angle) {
 //スタック検知
 bool isStack() {
   //定数
-  const float stack_limit = 10;  //スタック検知値
+  const float stack_limit = 50;  //スタック検知値
 
   bool ret = false;
   float acculate = sqrt(pow(ax_G, 2) + pow(ay_G, 2));

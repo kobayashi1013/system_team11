@@ -19,7 +19,7 @@ void task_Red() {  //自陣：赤の場合の挙動
 
     case 1:  //まず敵陣の方へ方向転換
       speed = 0;
-      rotSpeed = 160;     //時計回り
+      rotSpeed = -160;     //反時計回り
       if (waitfor(400)) {  //---------------------------------------------------------- -----------------------
         mode_G = 2;        //mode 2へ
       }
@@ -321,7 +321,7 @@ void task_Blue() {  //自陣：青の場合の挙動
 
     case 1:  //まず敵陣の方へ方向転換
       speed = 0;
-      rotSpeed = 160;     //時計回り
+      rotSpeed = -160;     //反時計回り
       if (waitfor(400)) {  //---------------------------------------------------------- -----------------------
         mode_G = 2;        //mode 2へ
       }
@@ -563,7 +563,7 @@ void task_Blue() {  //自陣：青の場合の挙動
       }
       break;
 
-    case 103:  //カップだして敵陣方向に回転した後のちょい直進
+    case 103:  //カップだして敵陣方向に回転した後の，ちょい直進
       rotSpeed = 0;
       speed = 190;
       if (waitfor(300)) {
@@ -603,7 +603,6 @@ void task_Blue() {  //自陣：青の場合の挙動
   motorL_G = speed + rotSpeed;
   motorR_G = speed - rotSpeed;
 }
-
 
 void linetrace_1or6()  //➀or➅Roboの場合 , P制御，反時計回り
 {

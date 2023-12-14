@@ -86,12 +86,12 @@ void colorSensorMonitor(int time) {
 void setupColorSensor() {
   tcs.begin();  //カラーセンサのセットアップ
   //狩野
-  // r_min = 62;
-  // g_min = 54;
-  // b_min = 51;
-  // r_max = 255;
-  // g_max = 255;
-  // b_max = 255;
+  r_min = 61;
+  g_min = 85;
+  b_min = 75;
+  r_max = 255;
+  g_max = 255;
+  b_max = 255;
 
   //小林君
   // r_min = 47;
@@ -102,12 +102,12 @@ void setupColorSensor() {
   // b_max = 255;
 
   //宇和佐君
-  r_min = 43;
-  g_min = 58;
-  b_min = 69;
-  r_max = 255;
-  g_max = 255;
-  b_max = 255;
+  // r_min = 43;
+  // g_min = 58;
+  // b_min = 69;
+  // r_max = 255;
+  // g_max = 255;
+  // b_max = 255;
 }
 
 //センサ値取得
@@ -131,9 +131,9 @@ void getColorSensor(float* _red, float* _green, float* _blue) {
 }
 
 int identify_color(float r, float g, float b) {
-  if (200 < r && 200 < g && 200 < b) {
+  if (220 < r && 220 < g && 220 < b) {
     return WHITE;  //白
-  } else if (r < 50 && g < 50 && b < 50) {
+  } else if (r < 70 && g < 70 && b < 70) {
     return BLACK;  //黒
   } else if (100 < r && g < 50 && b < 50) {
     return RED;  //赤
