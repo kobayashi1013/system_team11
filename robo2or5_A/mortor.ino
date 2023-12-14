@@ -167,6 +167,12 @@ void task_Red() {  //自陣：赤の場合の挙動
       if (timeNow_G - startTime < 1500) {
         rotSpeed = -140;  //反時計回り
       } else if (timeNow_G - startTime < 2700) {
+        if (color == BLACK) {
+          mode_G = 101;  //回転してもエリア内に戻らない時後退（自陣ラインにむかって左側）
+          speed = 0;
+          rotSpeed = 0;
+          startTime = timeNow_G;
+        }
         rotSpeed = 0;
         speed = 150;
       } else {
@@ -461,6 +467,12 @@ void task_Blue() {  //自陣：青の場合の挙動
       if (timeNow_G - startTime < 1500) {
         rotSpeed = -140;  //反時計回り
       } else if (timeNow_G - startTime < 2700) {
+        if (color == BLACK) {
+          mode_G = 101;  //回転してもエリア内に戻らない時後退（自陣ラインにむかって左側）
+          speed = 0;
+          rotSpeed = 0;
+          startTime = timeNow_G;
+        }
         rotSpeed = 0;
         speed = 150;
       } else {
