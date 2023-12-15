@@ -20,16 +20,16 @@ void setupCompass() {
 
   //キャリブレーションの初期値を設定
   //狩野
-  // compass.m_min.x = -890;  //(2回目)
+  // compass.m_min.x = -890;  
   // compass.m_min.y = -3533;
   // compass.m_max.x = 2558;
   // compass.m_max.y = 456;
 
   //小林君
-  compass.m_min.x = 417;
-  compass.m_min.y = -4127;
-  compass.m_max.x = 3451;
-  compass.m_max.y = -490;
+  compass.m_min.x = 636;
+  compass.m_min.y = -2237;
+  compass.m_max.x = 3780;
+  compass.m_max.y = 1629;
 
 
   // //宇和佐君
@@ -76,8 +76,8 @@ bool worldTurn(float* _rotSpeed, float angle) {
   const float PItrg = 45.0;   //PI制御とP制御の境界
   const float Kp = 4.0;       //比例ゲイン
   const float Ti = 2;         //積分時間
-  const float u_limit = 180;  //最大速度制限
-  const float e_limit = 5;    //制御時の閾値(10かもしれない)
+  const float u_limit = 120;  //最大速度制限
+  const float e_limit = 6;    //制御時の閾値(10かもしれない)
 
   static unsigned long _timePrev = millis();
   float u;

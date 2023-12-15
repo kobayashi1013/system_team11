@@ -33,10 +33,10 @@ void setupCompass() {
 
 
   // //宇和佐君
-  compass.m_min.x = -4000;
-  compass.m_min.y = -4406;
-  compass.m_max.x = -1729;
-  compass.m_max.y = -1742;
+  compass.m_min.x = -2343;
+  compass.m_min.y = -4140;
+  compass.m_max.x = 897;
+  compass.m_max.y = -531;
 
 
   delay(1000);  // 良く分からないが必要
@@ -76,8 +76,8 @@ bool worldTurn(float* _rotSpeed, float angle) {
   const float PItrg = 45.0;   //PI制御とP制御の境界
   const float Kp = 4.0;       //比例ゲイン
   const float Ti = 2;         //積分時間
-  const float u_limit = 180;  //最大速度制限
-  const float e_limit = 5;    //制御時の閾値(10かもしれない)
+  const float u_limit = 120;  //最大速度制限
+  const float e_limit = 6;    //制御時の閾値(10かもしれない)
 
   static unsigned long _timePrev = millis();
   float u;

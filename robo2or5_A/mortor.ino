@@ -29,7 +29,7 @@ void task_Red() {  //自陣：赤の場合の挙動
           startTime = timeNow_G;  //スタート時間取得
         }
       } else {               //偶数の場合↓
-        if (waitfor(500)) {  //----------------------1秒間たったら（秒数は後で調整）--------------------------------------------------------------------------------------
+        if (waitfor(800)) {  //----------------------1秒間たったら（秒数は後で調整）--------------------------------------------------------------------------------------
           mode_G = 3;        //mode 3へ
           speed = 0;
           startTime = timeNow_G;  //スタート時間取得
@@ -39,7 +39,7 @@ void task_Red() {  //自陣：赤の場合の挙動
 
     case 3:  //【time取得】，探索モード(回転)
       speed = 0;
-      rotSpeed = 140;
+      rotSpeed = 130;
       if (timeNow_G - startTime < 6000) {  //の間に↓
         if (search()) {                    //障害物を見つけたら↓
           rotSpeed = 0;                    //停止させる
@@ -81,7 +81,7 @@ void task_Red() {  //自陣：赤の場合の挙動
         rotSpeed = 190;
       } else {  //0.3秒たったら↓
         speed = 0;
-        rotSpeed = 140;
+        rotSpeed = 130;
         if (c_count < 2) {
           if (search()) {           //障害物を見つけたら↓
             rotSpeed = 0;           //停止させる
@@ -116,7 +116,7 @@ void task_Red() {  //自陣：赤の場合の挙動
       break;
 
     case 8:  //【time取得】回転で少しずらしてカップを捕まえに行く
-      rotSpeed = -140;
+      rotSpeed = -130;
       if (timeNow_G - startTime > zurashi_time) {
         rotSpeed = 0;
         mode_G = 10;
@@ -165,10 +165,10 @@ void task_Red() {  //自陣：赤の場合の挙動
     case 13:  //【time取得】ゴールモード，端の黒をふんでしまったら
       //回転→少し直進→また南に戻る
       if (timeNow_G - startTime < 1500) {
-        rotSpeed = -140;  //反時計回り
+        rotSpeed = -130;  //反時計回り
       } else if (timeNow_G - startTime < 2700) {
         if (color == BLACK) {
-          mode_G = 101;  //回転してもエリア内に戻らない時後退（自陣ラインにむかって左側）
+          mode_G = 104;  //回転してもエリア内に戻らない時後退（自陣ラインにむかって左側）
           speed = 0;
           rotSpeed = 0;
           startTime = timeNow_G;
@@ -177,7 +177,7 @@ void task_Red() {  //自陣：赤の場合の挙動
         speed = 150;
       } else {
         speed = 0;
-        if (worldTurn(&rotSpeed, 180)) {  //南（180）(より少しもどったところ)方向へ回転したら
+        if (worldTurn(&rotSpeed, 185)) {  //南（180）(より少しもどったところ)方向へ回転したら
           rotSpeed = 0;
           speed = 0;
           mode_G = 12;  //ゴールラインまで直進
@@ -205,7 +205,7 @@ void task_Red() {  //自陣：赤の場合の挙動
       rotSpeed = 0;
       if (timeNow_G - startTime > 1200) {
         speed = 0;
-        if (worldTurn(&rotSpeed, 24)) {  //北（敵陣方向）（0）方向へ回転したら
+        if (worldTurn(&rotSpeed, 27)) {  //北（敵陣方向）（0）方向へ回転したら
           rotSpeed = 0;
           speed = 0;
           g_count++;     //探索位置きりかえ
@@ -228,7 +228,7 @@ void task_Red() {  //自陣：赤の場合の挙動
         speed = 0;
       } else if (timeNow_G - startTime > 1300) {
         speed = 0;
-        rotSpeed = 140;
+        rotSpeed = 130;
         if (search()) {  //障害物を見つけたら↓，3秒探索
           rotSpeed = 0;
           speed = 0;
@@ -255,7 +255,7 @@ void task_Red() {  //自陣：赤の場合の挙動
       } else {
         speed = -200;
         if (color == RED || color == BLUE || color == BLACK) {
-          mode_G = 4;  //後退のとき黒をふんだら直進モードへ
+          mode_G = 105;  //後退のとき黒をふんだら直進モードへ
           startTime = timeNow_G;
         }
       }
@@ -267,6 +267,30 @@ void task_Red() {  //自陣：赤の場合の挙動
       if (waitfor(300)) {
         speed = 0;
         mode_G = 2;  //探索に戻る
+      }
+      break;
+
+    case 104:  //回転してもエリア内にmodoranaitoki
+               //もう少し回転→直進→探索に戻る
+      speed = 0;
+      rotSpeed = 170;
+      if (timeNow_G - startTime > 1500) {
+        speed = 0;
+        rotSpeed = 0;
+        mode_G = 3;  //探索（回転）
+        startTime = timeNow_G;
+      } else if (timeNow_G - startTime > 800) {
+        rotSpeed = 0;
+        speed = 180;
+      }
+      break;
+
+    case 105:  //スタックで黒見つけた時
+      speed = 0;
+      rotSpeed = 150;
+      if (timeNow_G - startTime > 1100) {
+        mode_G = 3;  //探索（回転）
+        startTime = timeNow_G;
       }
       break;
   }
@@ -286,6 +310,13 @@ void task_Red() {  //自陣：赤の場合の挙動
     if (color == RED || color == BLUE || color == BLACK) {
       mode_G = 101;  //mode 101　　へ
       startTime = timeNow_G;
+    }
+  }
+
+
+  if (mode_G == 11 || mode_G == 12 || mode_G == 13) {  //カップ抜けたら
+    if (dist_G - before_dist >= 10 || dist_G - before_dist <= -10) {
+      mode_G = 6;  //その場で探索回転
     }
   }
 
@@ -329,7 +360,7 @@ void task_Blue() {  //自陣：青の場合の挙動
           startTime = timeNow_G;  //スタート時間取得
         }
       } else {               //偶数の場合↓
-        if (waitfor(500)) {  //----------------------1秒間たったら（秒数は後で調整）--------------------------------------------------------------------------------------
+        if (waitfor(800)) {  //----------------------1秒間たったら（秒数は後で調整）--------------------------------------------------------------------------------------
           mode_G = 3;        //mode 3へ
           speed = 0;
           startTime = timeNow_G;  //スタート時間取得
@@ -339,7 +370,7 @@ void task_Blue() {  //自陣：青の場合の挙動
 
     case 3:  //【time取得】，探索モード(回転)
       speed = 0;
-      rotSpeed = 140;
+      rotSpeed = 130;
       if (timeNow_G - startTime < 6000) {  //の間に↓
         if (search()) {                    //障害物を見つけたら↓
           rotSpeed = 0;                    //停止させる
@@ -381,7 +412,7 @@ void task_Blue() {  //自陣：青の場合の挙動
         rotSpeed = 190;
       } else {  //0.3秒たったら↓
         speed = 0;
-        rotSpeed = 140;
+        rotSpeed = 130;
         if (c_count < 2) {
           if (search()) {           //障害物を見つけたら↓
             rotSpeed = 0;           //停止させる
@@ -416,7 +447,7 @@ void task_Blue() {  //自陣：青の場合の挙動
       break;
 
     case 8:  //【time取得】回転で少しずらしてカップを捕まえに行く
-      rotSpeed = -140;
+      rotSpeed = -130;
       if (timeNow_G - startTime > zurashi_time) {
         rotSpeed = 0;
         mode_G = 10;
@@ -439,9 +470,12 @@ void task_Blue() {  //自陣：青の場合の挙動
       break;
 
     case 11:                           //ゴールモード，ゴール方向へ回転
-      if (worldTurn(&rotSpeed, 24)) {  //北（0）方向へ回転したら
+      if (worldTurn(&rotSpeed, 27)) {  //北（0）方向へ回転したら
         rotSpeed = 0;
         mode_G = 12;
+      }
+      if (dist_G >= 30) {
+        mode_G = 6;  //その場で探索回転
       }
       break;
 
@@ -465,10 +499,10 @@ void task_Blue() {  //自陣：青の場合の挙動
     case 13:  //【time取得】ゴールモード，端の黒をふんでしまったら
       //回転→少し直進→また南に戻る
       if (timeNow_G - startTime < 1500) {
-        rotSpeed = -140;  //反時計回り
+        rotSpeed = -130;  //反時計回り
       } else if (timeNow_G - startTime < 2700) {
         if (color == BLACK) {
-          mode_G = 101;  //回転してもエリア内に戻らない時後退（自陣ラインにむかって左側）
+          mode_G = 104;  //回転してもエリア内に戻らない時後退（自陣ラインにむかって左側）
           speed = 0;
           rotSpeed = 0;
           startTime = timeNow_G;
@@ -477,7 +511,7 @@ void task_Blue() {  //自陣：青の場合の挙動
         speed = 150;
       } else {
         speed = 0;
-        if (worldTurn(&rotSpeed, 23)) {  //北（0）(より少しもどったところ)方向へ回転したら
+        if (worldTurn(&rotSpeed, 24)) {  //北（0）(より少しもどったところ)方向へ回転したら
           rotSpeed = 0;
           speed = 0;
           mode_G = 12;  //ゴールラインまで直進
@@ -528,7 +562,7 @@ void task_Blue() {  //自陣：青の場合の挙動
         speed = 0;
       } else if (timeNow_G - startTime > 1300) {
         speed = 0;
-        rotSpeed = 140;
+        rotSpeed = 130;
         if (search()) {  //障害物を見つけたら↓，3秒探索
           rotSpeed = 0;
           speed = 0;
@@ -555,7 +589,7 @@ void task_Blue() {  //自陣：青の場合の挙動
       } else {
         speed = -200;
         if (color == RED || color == BLUE || color == BLACK) {
-          mode_G = 4;  //後退のとき黒をふんだら直進モードへ
+          mode_G = 105;  //後退のとき黒をふんだら直進モードへ
           startTime = timeNow_G;
         }
       }
@@ -567,6 +601,30 @@ void task_Blue() {  //自陣：青の場合の挙動
       if (waitfor(300)) {
         speed = 0;
         mode_G = 2;  //探索に戻る
+      }
+      break;
+
+    case 104:  //回転してもエリア内にmodoranaitoki
+               //もう少し回転→直進→探索に戻る
+      speed = 0;
+      rotSpeed = 170;
+      if (timeNow_G - startTime > 1200) {
+        speed = 0;
+        rotSpeed = 0;
+        mode_G = 3;  //探索（回転）
+        startTime = timeNow_G;
+      } else if (timeNow_G - startTime > 700) {
+        rotSpeed = 0;
+        speed = 180;
+      }
+      break;
+
+    case 105:  //スタックで黒見つけた時
+      speed = 0;
+      rotSpeed = 150;
+      if (timeNow_G - startTime > 1100) {
+        mode_G = 3;  //探索（回転）
+        startTime = timeNow_G;
       }
       break;
   }
@@ -589,6 +647,12 @@ void task_Blue() {  //自陣：青の場合の挙動
     }
   }
 
+  if (mode_G == 11 || mode_G == 12 || mode_G == 13) {  //カップ抜けたら
+    if (dist_G - before_dist >= 10 || dist_G - before_dist <= -10) {
+      mode_G = 6;  //その場で探索回転
+    }
+  }
+
   if (mode_G == 2 || mode_G == 4 || mode_G == 10 || mode_G == 11 || mode_G == 12 || mode_G == 13 || mode_G == 99 || mode_G == 100) {  //スタック検知
     if (isStack()) {
       mode_G = 102;
@@ -601,7 +665,6 @@ void task_Blue() {  //自陣：青の場合の挙動
   motorL_G = speed + rotSpeed;
   motorR_G = speed - rotSpeed;
 }
-
 
 void linetrace_1or6()  //➀or➅Roboの場合 , P制御，反時計回り
 {
