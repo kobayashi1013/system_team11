@@ -102,9 +102,9 @@ void setupColorSensor() {
   // b_max = 255;
 
   //宇和佐君
-  r_min = 43;
-  g_min = 58;
-  b_min = 69;
+  r_min = 60;
+  g_min = 74;
+  b_min = 75;
   r_max = 255;
   g_max = 255;
   b_max = 255;

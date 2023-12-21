@@ -76,8 +76,8 @@ bool worldTurn(float* _rotSpeed, float angle) {
   const float PItrg = 45.0;   //PI制御とP制御の境界
   const float Kp = 4.0;       //比例ゲイン
   const float Ti = 2;         //積分時間
-  const float u_limit = 120;  //最大速度制限
-  const float e_limit = 6;    //制御時の閾値(10かもしれない)
+  const float u_limit = 125;  //最大速度制限
+  const float e_limit = 7;    //制御時の閾値(10かもしれない)
 
   static unsigned long _timePrev = millis();
   float u;

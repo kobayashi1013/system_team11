@@ -42,7 +42,7 @@ int distance() {
   interval = pulseIn(echo, HIGH, 23071);              //Echo信号がHIGHである時間(μs)を計測
   dist = (0.61 * 25 + 331.5) * interval / 10000 / 2;  //距離(cm)に変換
 
-  delay(60);  //trigがHIGHになる間隔を60ms以上空ける（超音波センサの仕様）
+  //delay(60);  //trigがHIGHになる間隔を60ms以上空ける（超音波センサの仕様）
 
   return dist;
 }

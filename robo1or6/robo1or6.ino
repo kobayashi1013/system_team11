@@ -36,7 +36,7 @@ int motorR_G, motorL_G;                           // 左右のZumoのモータ�
 float mx_G = 0, my_G = 0, mz_G = 0;               //地磁気センサで読み取った値
 float ax_G = 0, ay_G = 0, az_G = 0;
 float heading_G = 0;
-int dist_G = 0;
+static int dist_G = 0;
 static int before_dist = 0;  //超音波センサ
 
 float sum_e = 0;     //turnTo関数で使用
@@ -48,6 +48,7 @@ int g_count = 0;     //task_Red,Blue で使用goal_count 探索位置（自陣�
 int first = 0;  //最初のみ，初期位置の角度を取得する用
 int Color = 0;  //自陣の色　赤：１，青：２
 float kakudo = 0;
+static unsigned long dist60_time;  //超音波センサdelay(60)計測用
 // float kakudo180 = 0;  //初期位置と，反対方向の角度
 
 
@@ -64,6 +65,7 @@ void setup() {
   //button.waitForButton();
 
   timeInit_G = millis();
+  dist60_time = millis();
   timePrev_G = 0;
   mode_G = 0;
   motorR_G = 0;
@@ -73,13 +75,18 @@ void setup() {
 void loop() {
   getColorSensor(&red_G, &green_G, &blue_G);  // カラーセンサでRGB値を取得(0-255)
   color = identify_color(red_G, green_G, blue_G);
-  getCompass();         //地磁気センサでmx_G, my_Gを取得
-  dist_G = distance();  //超音波センサ
-  if (dist_G == 0) {    //エラーでたら前の距離を代入
-    dist_G = before_dist;
+  getCompass();  //地磁気センサでmx_G, my_Gを取得
+
+  timeNow_G = millis() - timeInit_G;  // 経過時間
+
+  if (timeNow_G - dist60_time > 60) {
+    dist_G = distance();  //超音波センサ
+    if (dist_G == 0) {    //エラーでたら前の距離を代入
+      dist_G = before_dist;
+    }
+    dist60_time = timeNow_G; //時間更新 
   }
 
-  timeNow_G = millis() - timeInit_G;     // 経過時間
   motors.setSpeeds(motorL_G, motorR_G);  // 左右モーターへの回転力入力
   sendData();                            // データ送信
 

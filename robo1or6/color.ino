@@ -86,9 +86,9 @@ void colorSensorMonitor(int time) {
 void setupColorSensor() {
   tcs.begin();  //カラーセンサのセットアップ
   //狩野
-  r_min = 61;
-  g_min = 85;
-  b_min = 75;
+  r_min = 41;
+  g_min = 53;
+  b_min = 54;
   r_max = 255;
   g_max = 255;
   b_max = 255;
