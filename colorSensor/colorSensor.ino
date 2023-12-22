@@ -119,6 +119,9 @@ void getColorSensor(float* _red, float* _green, float* _blue)
 //色の判別(N近傍法)
 int identifyColor(int r, int g, int b)
 {
+  //定数
+  const int color_limit = 10; //カラー距離閾値
+
   int color = -1;
   float minDistance = 99999;
 
@@ -134,7 +137,10 @@ int identifyColor(int r, int g, int b)
       minDistance = distance;
       color = i;
     }
-  }
 
-  return color;
+    if (minDistance <= color_limit)
+      return color;
+    else
+      return -1; //閾値に近づいていない
+  }
 }
