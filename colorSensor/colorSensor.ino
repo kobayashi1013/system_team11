@@ -10,10 +10,11 @@ void setup() {
   setupColorSensor();
   button.waitForButton();
   //calibrationColorSensor();
+  //button.waitForButton();
 }
 void loop()
 {
-  colorSensorMonitor(500);
+  colorSensorMonitor(100);
 }
 
 //以下本体
@@ -23,10 +24,10 @@ Adafruit_TCS34725 colorSensor = Adafruit_TCS34725(TCS34725_INTEGRATIONTIME_2_4MS
 float red_max, green_max, blue_max = 0;
 float red_min, green_min, blue_min = 0;
 unsigned int colorPos[colorNum][3] = {
-  {255, 255, 255}, //白
-  {12, 25, 28}, //黒
-  {121, 2, 4}, //赤
-  {1, 32, 96}, //青
+  {244, 255, 255}, //白
+  {21, 32, 29}, //黒
+  {118, 2, 2}, //赤
+  {0, 23, 78}, //青
 };
 
 //キャリブレーション用
@@ -37,7 +38,7 @@ void calibrationColorSensor()
 
   motor.setSpeeds(50, 50); //前進
 
-  for (int i = 0; i < 100; i++)
+  for (int i = 0; i < 150; i++)
   {
     colorSensor.getRGB(&red, &green, &blue);
 
@@ -78,21 +79,22 @@ void colorSensorMonitor(int time)
     _timePrev = millis();
 
     //色の観測
-    /*getColorSensor(&red, &green, &blue);
-    Serial.print("color : ");
-    Serial.print(red);
+    
+    getColorSensor(&red, &green, &blue);
+    //Serial.print("color : ");
+    /*Serial.print(red);
     Serial.print(' ');
     Serial.print(green);
     Serial.print(' ');
     Serial.println(blue);*/
 
     //色の判定
-    int color = identifyColor(red, green, blue);
-    if (color != -1 && color != colorPrev)
+    //int color = identifyColor(red, green, blue);
+    Serial.println(identifyColor(red, green, blue));
+    /*if (color != -1)
     {
       Serial.println(identifyColor(red, green, blue));
-      colorPrev = color;
-    }
+    }*/
   }
 }
 
@@ -101,9 +103,9 @@ void setupColorSensor()
 {
   colorSensor.begin();
 
-  red_min = 47;
-  green_min = 66;
-  blue_min = 67;
+  red_min = 39;
+  green_min = 59;
+  blue_min = 63;
   red_max = 255;
   green_max = 255;
   blue_max = 255;
@@ -126,7 +128,7 @@ void getColorSensor(float* _red, float* _green, float* _blue)
 int identifyColor(int r, int g, int b)
 {
   //定数
-  const int color_limit = 10; //カラー距離閾値
+  const int color_limit = 100; //カラー距離閾値
 
   int color = -1;
   float minDistance = 99999;
@@ -143,10 +145,11 @@ int identifyColor(int r, int g, int b)
       minDistance = distance;
       color = i;
     }
-
-    if (minDistance <= color_limit)
-      return color;
-    else
-      return -1; //閾値に近づいていない
   }
+
+  //色検知
+  if (abs(minDistance) <= color_limit)
+    return color;
+  else
+    return -1; //閾値に近づいていない
 }
