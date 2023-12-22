@@ -71,6 +71,7 @@ void calibrationColorSensor()
 void colorSensorMonitor(int time)
 {
   static unsigned long _timePrev = millis();
+  static int colorPrev = 0;
 
   if (millis() - _timePrev >= time)
   {
@@ -86,7 +87,12 @@ void colorSensorMonitor(int time)
     Serial.println(blue);*/
 
     //色の判定
-    //Serial.println(identifyColor(red, green, blue));
+    int color = identifyColor(red, green, blue);
+    if (color != -1 && color != colorPrev)
+    {
+      Serial.println(identifyColor(red, green, blue));
+      colorPrev = color;
+    }
   }
 }
 
