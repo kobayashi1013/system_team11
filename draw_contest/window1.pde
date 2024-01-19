@@ -22,7 +22,32 @@ void Window1() //ロボットの基本情報
     fill(240);
     textFont(font[1]);
     textSize(48);
-    text("探索中", 40, (screen_height - 80) / robot_num * i + 228);
+    switch (robot_mode[i])
+    {
+      case 1:
+      case 2:
+      case 3:
+      case 4:
+      case 5:
+      case 6:
+      case 7:
+      case 8:
+      case 9:
+      case 10:
+      case 101:
+      case 300:
+        text("探索中", 40, (screen_height - 80) / robot_num * i + 228);
+        break;
+      case 11:
+      case 12:
+      case 13:
+      case 99:
+      case 100:
+        text("運搬中", 40, (screen_height - 80) / robot_num * i + 228);
+        break;
+    }
+    
+    
     
     //得点
     fill(227, 37, 94);
