@@ -105,7 +105,7 @@ void loop() {
   }
 
   getColorSensor(&red_G, &green_G, &blue_G);  // カラーセンサでRGB値を取得(0-255)
-  color = identify_color(red_G, green_G, blue_G);
+  color = identifyColor(red_G, green_G, blue_G);
   getCompass();  //地磁気センサでmx_G, my_Gを取得
 
   timeNow_G = millis() - timeInit_G;  // 経過時間

@@ -78,7 +78,7 @@ void colorSensorMonitor(int time) {
     Serial.println(blue);*/
 
     //色の判定
-    Serial.println(identifyColor());
+    // Serial.println(identifyColor());
   }
 }
 
@@ -94,9 +94,9 @@ void setupColorSensor() {
   // b_max = 255;
 
   //小林君
-  r_min = 47;
-  g_min = 66;
-  b_min = 67;
+  r_min = 44;
+  g_min = 64;
+  b_min = 65;
   r_max = 255;
   g_max = 255;
   b_max = 255;
@@ -146,26 +146,32 @@ int identify_color(float r, float g, float b) {
 }
 
 
-//色の判別(N近傍法)
-int identifyColor() {
-  int color = -1;
-  static float minDistance = 99999;
+//色の判別(N近傍法)(小林君のやつ)
+int identifyColor(float r, float g, float b)
+{
+  //定数
+  const int color_limit = 100; //カラー距離閾値
 
-  //色を取得
-  float _red, _green, _blue = 0;
-  getColorSensor(&_red, &_green, &_blue);
+  int color = -1;
+  float minDistance = 99999;
 
   //全色との距離を計算
-  for (int i = 0; i < colorNum; i++) {  //0~3:赤，青，黒，白のどれかにあてはまるまで
-    float distance = sqrt(pow(_red - colorPos[i][0], 2)
-                          + pow(_green - colorPos[i][1], 2)
-                          + pow(_blue - colorPos[i][2], 2));
-
-    if (distance < minDistance) {
+  for (int i = 0; i < colorNum; i++)
+  {
+    float distance = sqrt(pow(r - colorPos[i][0], 2)
+      + pow(g - colorPos[i][1], 2)
+      + pow(b - colorPos[i][2], 2));
+    
+    if (distance < minDistance)
+    {
       minDistance = distance;
       color = i;
     }
   }
 
-  return color;
+  //色検知
+  if (abs(minDistance) <= color_limit)
+    return color;
+  else
+    return -1; //閾値に近づいていない
 }
