@@ -209,7 +209,7 @@ void task_Red() {  //自陣：赤の場合の挙動
     case 100:       //【time取得】カップをゴールライン外へ出す（斜めから入った場合）
       speed = 160;  //0.3秒前進
       rotSpeed = 0;
-      if (timeNow_G - startTime > 1200) {
+      if (timeNow_G - startTime > 800) {
         speed = 0;
         if (worldTurn(&rotSpeed, 27)) {  //北（敵陣方向）（0）方向へ回転したら
           rotSpeed = 0;
@@ -553,7 +553,7 @@ void task_Blue() {  //自陣：青の場合の挙動
     case 100:       //【time取得】カップをゴールライン外へ出す（斜めから入った場合）
       speed = 160;  //0.3秒前進
       rotSpeed = 0;
-      if (timeNow_G - startTime > 1200) {
+      if (timeNow_G - startTime > 800) {
         speed = 0;
         if (worldTurn(&rotSpeed, 190)) {  //南（敵陣方向）（180）方向へ回転したら
           rotSpeed = 0;
